@@ -5,6 +5,7 @@ class ModelBase(ABC):
         self.model = None
         self.scaler = None
         self.features = None
+        self.name = None
     
     @abstractmethod
     def train(self, dataset, features):
