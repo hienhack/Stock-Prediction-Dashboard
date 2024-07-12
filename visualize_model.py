@@ -1,19 +1,16 @@
 from model.LSTMModel import LSTMModel
 from model.RNNModel import RNNModel
 import yfinance as yf
-from pandas_datareader import data as pdr
-yf.pdr_override()
-
-import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 sns.set_style('whitegrid')
 plt.style.use("fivethirtyeight")
 
+import os
 from datetime import datetime
 
 def load_data():
-    df = pdr.get_data_yahoo('BTC-USD', start='2012-01-01', end=datetime.now())
+    df = yf.download('BTC-USD', start='2012-01-01', end=datetime.now())
     return df
 
 def addROC(df):
@@ -39,11 +36,6 @@ def prepare_data():
     df = addMovingAverage(df)
     df = df.dropna()
     return df
-
-def train_and_save_model(df, model_class, stock, features, base_path="./trained"):
-    model = model_class(stock)
-    model.train(df, features)
-    model.save(base_path)
 
 def plot_prediction(df, model, features):
     dataToPredict = df[-70:]
@@ -71,31 +63,6 @@ def visualize_model(stock, model_class, features):
     model.load(model_path)
     plot_prediction(df, model, features)
 
-
-def main():
-    df = prepare_data()
-    stock = 'BTC'
-
-    feature_sets = [
-        ['Close'],
-        ['ROC'],
-        ['RSI'],
-        ['Moving Average'],
-        ['Close', 'ROC'],
-        ['Close', 'RSI'],
-        ['Close', 'Moving Average'],
-        ['ROC', 'RSI'],
-        ['ROC', 'Moving Average'],
-        ['RSI', 'Moving Average'],
-        ['Close', 'ROC', 'RSI'],
-        ['Close', 'ROC', 'Moving Average'],
-        ['ROC', 'RSI', 'Moving Average'],
-        ['Close', 'ROC', 'RSI', 'Moving Average']
-    ]
-
-    for features in feature_sets:
-        train_and_save_model(df, RNNModel, stock, features)
-        # train_and_save_model(df, LSTMModel, stock, features)
-
 if __name__ == '__main__':
-    main()
+    stock = 'BTC'
+    visualize_model(stock, RNNModel, ['Close', 'ROC', 'RSI', 'Moving Average'])
