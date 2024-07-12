@@ -1,5 +1,6 @@
 from model.LSTMModel import LSTMModel
 from model.RNNModel import RNNModel
+from model.XgboostModel import XGBoostModel
 import yfinance as yf
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -65,4 +66,4 @@ def visualize_model(stock, model_class, features):
 
 if __name__ == '__main__':
     stock = 'BTC'
-    visualize_model(stock, RNNModel, ['Close', 'ROC', 'RSI', 'Moving Average'])
+    visualize_model(stock,XGBoostModel , ['Close', 'ROC', 'RSI', 'Moving Average'])

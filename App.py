@@ -100,5 +100,4 @@ def main():
         # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
-    # main()
-    visualize_model('BTC', XGBoostModel, ['Close', 'ROC'])
+    main()
