@@ -14,13 +14,21 @@ class LSTMModel(ModelBase):
         self.x_scaler = None
         self.y_scaler = None
     
-    def train(self, dataset, features):
-        # dataset includes the following columns: Open, High, Low, Close, Adj Close, Volume according to the order
+    def train(self, data, features):
+        self.features = features
+        # data includes the following columns: Open, High, Low, Close, Adj Close, Volume respectively according to the order
+        
+        # Keep only the features that we want to use
+        dataset = data[features].values
+
         self.x_scaler = StandardScaler()
         self.y_scaler = StandardScaler()
 
         x_scaled_data = self.x_scaler.fit_transform(dataset)
-        y_scaled_data = self.y_scaler.fit_transform(dataset[:,0:4])
+
+        # We will predict the next day's Open, High, Low, Close prices
+        # Open, High, Low, Close prices are always in the first 4 columns
+        y_scaled_data = self.y_scaler.fit_transform(data.values[:, :4])
         
         x_train = []
         # y_train includes the following columns: Open, High, Low, Close according to the order
@@ -41,6 +49,9 @@ class LSTMModel(ModelBase):
         # Load the scaler
         self.x_scaler = joblib.load(path + "/x_scaler.save")
         self.y_scaler = joblib.load(path + "/y_scaler.save")
+        # Load the features
+        with open(path + "/features.txt", "r") as f:
+            self.features = f.read().split(",")
         print("Model and scaler loaded from", path)
     
     def save(self, path):
@@ -49,14 +60,19 @@ class LSTMModel(ModelBase):
         # Save the scaler
         joblib.dump(self.x_scaler, path + "/x_scaler.save")
         joblib.dump(self.y_scaler, path + "/y_scaler.save")
+        # Save the features
+        with open(path + "/features.txt", "w") as f:
+            f.write(",".join(self.features))
         print(f"Model and scaler saved to {path}")
 
     def predict(self, dataToPredict):
+        dataset = dataToPredict[self.features].values
         x_test = []
-        x_scaled_data = self.x_scaler.transform(dataToPredict)
-        for i in range(self.T, len(dataToPredict)):
-            x_test.append(x_scaled_data[i-self.T:i])
+        x_scaled_data = self.x_scaler.transform(dataset)
+        for i in range(self.T, len(dataset) + 1):
+            x_test.append(x_scaled_data[i-self.T:i, :])
         x_test = np.array(x_test)
+
         prediction = self.model.predict(x_test)
         prediction = self.y_scaler.inverse_transform(prediction)
         return prediction

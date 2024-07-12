@@ -11,26 +11,44 @@ plt.style.use("fivethirtyeight")
 from datetime import datetime
 
 def load_data():
+    # Load the data, the data includes the following columns: Open, High, Low, Close, Adj Close, Volume 
+    # respectively according to the order
     df = pdr.get_data_yahoo('AAPL', start='2012-01-01', end=datetime.now())
-    dataset = df.values
-    return df, dataset
+    return df
+
+# Add technical indicators to the dataset
+def addROC(df):
+    df['ROC'] = ((df['Close'] - df['Close'].shift(12)) / (df['Close'].shift(12))) * 100
+    return df
+
+# Add RSI to the dataset
+def addRSI(df):
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    rs = gain / loss
+    df['RSI'] = 100 - (100 / (1 + rs))
+    return df
 
 def test():
-    df, dataset = load_data()
+    df = load_data()
+    features = ['Open', 'High', 'Low', 'Close']
     model = LSTMModel('AAPL')
-    model.train(dataset, ['Open', 'High', 'Low', 'Close'])
+    model.train(df, features)
     model.save("./trained")
 
-    # get the last 60 days data
-    data = dataset[-60:, :]
-    prediction = model.predict(dataset[-60:, :])
+    # get last 60 days data
+    dataToPredict = df[-60:]
+    
+    prediction = model.predict(dataToPredict)
     print("Prediction:", prediction)
 
 def test_from_load():
-    df, dataset = load_data()
+    df = load_data()
     model = LSTMModel('AAPL')
     model.load("./trained")
-    prediction = model.predict(dataset[-70:, :])
+    prediction = model.predict(df[-70:])
+    print("Prediction:", prediction)
 
     plot_data = df[['Open', 'High', 'Low', 'Close']]
     train = plot_data[:-10]
@@ -51,5 +69,4 @@ def test_from_load():
     
 
 if __name__ == '__main__':
-    # test()
-    test_from_load()
+    test();
