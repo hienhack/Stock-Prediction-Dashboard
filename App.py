@@ -1,5 +1,6 @@
 from model.LSTMModel import LSTMModel
 from model.RNNModel import RNNModel
+from model.XgboostModel import XGBoostModel
 import yfinance as yf
 from pandas_datareader import data as pdr
 yf.pdr_override()
@@ -94,8 +95,10 @@ def main():
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, RNNModel, stock, features)
+        train_and_save_model(df, XGBoostModel, stock, features)
+        # train_and_save_model(df, RNNModel, stock, features)
         # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
-    main()
+    # main()
+    visualize_model('BTC', XGBoostModel, ['Close', 'ROC'])
