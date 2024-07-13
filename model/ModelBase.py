@@ -12,7 +12,7 @@ class ModelBase(ABC):
         """
         Train prediction model
         Dataset: dataset
-        Traning features: features
+        Training features: features
         """
         pass
 
@@ -24,12 +24,11 @@ class ModelBase(ABC):
         pass
     
     @abstractmethod
-    def save(sefl, path):
+    def save(self, path):
         """
         Save model
         """
         pass
-
 
     @abstractmethod
     def predict(self, dataToPredict):
@@ -37,4 +36,3 @@ class ModelBase(ABC):
         Predict candle price
         """
         pass
-    
