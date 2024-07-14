@@ -40,44 +40,31 @@ def handle_leave(data):
     rooms[room] -= 1
     leave_room(room)
 
-def find_model(room):
+def find_model(symbol, features):
     """
-    Find and load the model for the given room.
+    Find and load the model for the given symbol and features.
+    Example: find_model('BTC', ['Close', 'ROC', 'Moving Average'])
     """
-    parts = room.split('_')
-    if len(parts) < 2:
-        print(f"Invalid room format: {room}")
-        return None
+    method_classes = {
+        "LSTM": LSTMModel,
+        "RNN": RNNModel,
+        "XGBoost": XGBoostModel
+    }
 
-    symbol_method = parts[0]
-    features = parts[1:]
-    
-    symbol, method = symbol_method.split('-')
-    
-    model_path = os.path.join("./trained", room)
-    
-    if not os.path.exists(model_path):
-        print(f"Model path does not exist: {model_path}")
-        return None
+    for method, model_class in method_classes.items():
+        model_name = f"{symbol}-{method}_{'_'.join(features)}"
+        model_path = os.path.join("./trained", model_name)
+        if os.path.exists(model_path):
+            model = model_class(symbol)
+            try:
+                model.load(model_path)
+                return model
+            except Exception as e:
+                print(f"Failed to load model {model_name}: {e}")
+                return None
 
-    if method == "LSTM":
-        model_class = LSTMModel
-    elif method == "RNN":
-        model_class = RNNModel
-    elif method == "XGBoost":
-        model_class = XGBoostModel
-    else:
-        print(f"Unknown method: {method}")
-        return None
-
-    model = model_class(symbol)
-    try:
-        model.load(model_path)
-    except Exception as e:
-        print(f"Failed to load model: {e}")
-        return None
-    return model
-
+    print(f"No model found for symbol {symbol} with features {features}")
+    return None
 
 def broadcast(price):
     '''
