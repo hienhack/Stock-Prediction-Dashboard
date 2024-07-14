@@ -3,6 +3,7 @@ from model.RNNModel import RNNModel
 from model.XgboostModel import XGBoostModel
 import yfinance as yf
 from pandas_datareader import data as pdr
+import pandas as pd
 yf.pdr_override()
 
 import os
@@ -14,7 +15,7 @@ plt.style.use("fivethirtyeight")
 from datetime import datetime
 
 def load_data():
-    df = pdr.get_data_yahoo('BTC-USD', start='2012-01-01', end=datetime.now())
+    df = pd.read_csv('data/BTC-USD.csv')
     return df
 
 def addROC(df):
