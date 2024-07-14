@@ -4,6 +4,12 @@ from flask_socketio import SocketIO, join_room, leave_room
 import socket
 from AppSocket import subscribe, unsubscribe
 
+from model.LSTMModel import LSTMModel
+from model.RNNModel import RNNModel
+from model.XgboostModel import XGBoostModel
+import os
+
+
 receiver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 receiver.connect();
 
@@ -35,9 +41,43 @@ def handle_leave(data):
     leave_room(room)
 
 def find_model(room):
-    # TODO
-    # Find model for the room
-    pass
+    """
+    Find and load the model for the given room.
+    """
+    parts = room.split('_')
+    if len(parts) < 2:
+        print(f"Invalid room format: {room}")
+        return None
+
+    symbol_method = parts[0]
+    features = parts[1:]
+    
+    symbol, method = symbol_method.split('-')
+    
+    model_path = os.path.join("./trained", room)
+    
+    if not os.path.exists(model_path):
+        print(f"Model path does not exist: {model_path}")
+        return None
+
+    if method == "LSTM":
+        model_class = LSTMModel
+    elif method == "RNN":
+        model_class = RNNModel
+    elif method == "XGBoost":
+        model_class = XGBoostModel
+    else:
+        print(f"Unknown method: {method}")
+        return None
+
+    model = model_class(symbol)
+    try:
+        model.load(model_path)
+    except Exception as e:
+        print(f"Failed to load model: {e}")
+        return None
+    return model
+
 
 def broadcast(price):
     '''
