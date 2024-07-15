@@ -4,55 +4,55 @@ from flask_socketio import SocketIO, join_room, leave_room
 import socket
 from AppSocket import subscribe, unsubscribe
 
-# from model.LSTMModel import LSTMModel
-# from model.RNNModel import RNNModel
-# from model.XgboostModel import XGBoostModel
-# import os
+from model.LSTMModel import LSTMModel
+from model.RNNModel import RNNModel
+from model.XgboostModel import XGBoostModel
+import os
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
-# def find_model(symbol, features):
-#     """
-#     Find and load the model for the given symbol and features.
-#     Example: find_model('BTC', ['Close', 'ROC', 'Moving Average'])
-#     """
-#     method_classes = {
-#         "LSTM": LSTMModel,
-#         "RNN": RNNModel,
-#         "XGBoost": XGBoostModel
-#     }
+def find_model(symbol, features):
+    """
+    Find and load the model for the given symbol and features.
+    Example: find_model('BTC', ['Close', 'ROC', 'Moving Average'])
+    """
+    method_classes = {
+        "LSTM": LSTMModel,
+        "RNN": RNNModel,
+        "XGBoost": XGBoostModel
+    }
 
-#     for method, model_class in method_classes.items():
-#         model_name = f"{symbol}-{method}_{'_'.join(features)}"
-#         model_path = os.path.join("./trained", model_name)
-#         if os.path.exists(model_path):
-#             model = model_class(symbol)
-#             try:
-#                 model.load(model_path)
-#                 return model
-#             except Exception as e:
-#                 print(f"Failed to load model {model_name}: {e}")
-#                 return None
+    for method, model_class in method_classes.items():
+        model_name = f"{symbol}-{method}_{'_'.join(features)}"
+        model_path = os.path.join("./trained", model_name)
+        if os.path.exists(model_path):
+            model = model_class(symbol)
+            try:
+                model.load(model_path)
+                return model
+            except Exception as e:
+                print(f"Failed to load model {model_name}: {e}")
+                return None
 
-#     print(f"No model found for symbol {symbol} with features {features}")
-#     return None
+    print(f"No model found for symbol {symbol} with features {features}")
+    return None
 
-# # Khởi tạo model là btcusdt lstm close roc
-# model = None
+# Khởi tạo model là btcusdt lstm close roc
+model = None
 
-# @app.route('/change-model', methods=['POST'])
-# def change_model():
-#     '''
-#     request body: {
-#         model: "LSTM",
-#         symbol: "BTCUSDT",
-#         features: ["Close", "Roc"]
-#         # return 400 if not round
-#     }
-#     '''
-#     # global model = find_model('')
-#     pass
+@app.route('/change-model', methods=['POST'])
+def change_model():
+    '''
+    request body: {
+        model: "LSTM",
+        symbol: "BTCUSDT",
+        features: ["Close", "Roc"]
+        # return 400 if not round
+    }
+    '''
+    # global model = find_model('')
+    pass
 
 @app.route('/current-model')
 def get_current_model():
