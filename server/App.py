@@ -4,104 +4,91 @@ from flask_socketio import SocketIO, join_room, leave_room
 import socket
 from AppSocket import subscribe, unsubscribe
 
-from model.LSTMModel import LSTMModel
-from model.RNNModel import RNNModel
-from model.XgboostModel import XGBoostModel
-import os
-
-
-receiver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-receiver.connect();
+# from model.LSTMModel import LSTMModel
+# from model.RNNModel import RNNModel
+# from model.XgboostModel import XGBoostModel
+# import os
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
 
-server = SocketIO(app)
+# def find_model(symbol, features):
+#     """
+#     Find and load the model for the given symbol and features.
+#     Example: find_model('BTC', ['Close', 'ROC', 'Moving Average'])
+#     """
+#     method_classes = {
+#         "LSTM": LSTMModel,
+#         "RNN": RNNModel,
+#         "XGBoost": XGBoostModel
+#     }
 
-rooms = {}
-models = {}
+#     for method, model_class in method_classes.items():
+#         model_name = f"{symbol}-{method}_{'_'.join(features)}"
+#         model_path = os.path.join("./trained", model_name)
+#         if os.path.exists(model_path):
+#             model = model_class(symbol)
+#             try:
+#                 model.load(model_path)
+#                 return model
+#             except Exception as e:
+#                 print(f"Failed to load model {model_name}: {e}")
+#                 return None
 
-@server.on('join')
-def handle_join(data):
-    room = data['room']
-    if room not in rooms:
-        rooms[room] = 1
-        # TODO
-        # Find(load) model for the room
-        # model = find_model(room)
-        # models[room] = model
-    else:
-        rooms[room] += 1
-    join_room(room)
+#     print(f"No model found for symbol {symbol} with features {features}")
+#     return None
 
-@server.on('leave')
-def handle_leave(data):
-    room = data['room']
-    rooms[room] -= 1
-    leave_room(room)
+# # Khởi tạo model là btcusdt lstm close roc
+# model = None
 
-def find_model(symbol, features):
-    """
-    Find and load the model for the given symbol and features.
-    Example: find_model('BTC', ['Close', 'ROC', 'Moving Average'])
-    """
-    method_classes = {
-        "LSTM": LSTMModel,
-        "RNN": RNNModel,
-        "XGBoost": XGBoostModel
-    }
+# @app.route('/change-model', methods=['POST'])
+# def change_model():
+#     '''
+#     request body: {
+#         model: "LSTM",
+#         symbol: "BTCUSDT",
+#         features: ["Close", "Roc"]
+#         # return 400 if not round
+#     }
+#     '''
+#     # global model = find_model('')
+#     pass
 
-    for method, model_class in method_classes.items():
-        model_name = f"{symbol}-{method}_{'_'.join(features)}"
-        model_path = os.path.join("./trained", model_name)
-        if os.path.exists(model_path):
-            model = model_class(symbol)
-            try:
-                model.load(model_path)
-                return model
-            except Exception as e:
-                print(f"Failed to load model {model_name}: {e}")
-                return None
-
-    print(f"No model found for symbol {symbol} with features {features}")
-    return None
-
-def broadcast(price):
+@app.route('/current-model')
+def get_current_model():
     '''
-    TODO
-    predict next price
-    price: {"s": "BTCUSDT", "l": 50000, h: 51000, c: 50500, o: 49000, t: 1630000000, T: 1630000000}
-    data: {
-        "message": "NEW_CANDLESTICK",
-        "actualPrice": price, 
-        "symbol": "BTCUSDT", 
-        "predPrice": {
-            "l": 50000, 
-            "h": 51000, 
-            "c": 50500, 
-            "o": 49000,
+    return json object:
+        {
+            model: "LSTM",
+            symbol: "BTCUSDT",
+            features: ['Close', 'ROC']
         }
-    }
     '''
-    # server.emit('message', data, room=data['room'])
+    pass
+
+@app.route('/prediction')
+def get_prediction():
+    '''
+    request url format: /prediction?end=17800212321&limit=10
+    
+    end: the last time point of the prediciction
+    limit: number of time points
+
+    return 
+    [[t, o, h, l, c], [t, o, h, l, c], .....]                       (*)
+
+
+    lấy dữ liệu từ python binance, hoặc yfinance, interval 5m, chú ý đự đoán đúng thời gian, mốc thời gian
+    vì ở front e t lấy mốc là 5m, nó trả về 15:00, 15:05,...
+    ví dụ điểm thời gian cuối cùng (end) khi đã convert là 15:05 thì phần tử cuối cùng của (*) phải có t = 15:05 (dạng timestamp)
+    dùng: global model   để dự đoán
+    có thể lưu lại dữ liệu rồi load thêm các mốc mới để tiết kiệm thời gian
+    '''
     pass
 
 @app.route('/')
 def home():
     return render_template('index.html')
-
-
-@app.route('/candlesticks')
-def get_candelsticks():
-    ''' 
-    TODO
-    request: /candlesticks?symbol=btcusdt&feature=close,rsi,roc&model=lstm
-    fetch from binance 2000 data points, 3 minutes interval
-    can use python-binance: https://python-binance.readthedocs.io/en/latest/market_data.html#id7
-    '''
-    pass
-
-
 
 # Route mẫu, call API body: {"tweet": "I am happy"}
 @app.route('/analyze', methods=['POST'])

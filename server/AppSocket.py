@@ -73,4 +73,4 @@ async def start_websocket_client(symbol):
 
 # Test socket connection
 symbol = 'BTCUSDT'
-asyncio.run(start_websocket_client(symbol))
+# asyncio.run(start_websocket_client(symbol))
