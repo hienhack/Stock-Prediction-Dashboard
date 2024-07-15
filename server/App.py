@@ -15,7 +15,7 @@ app.secret_key = "secret_key"
 def find_model(symbol, features):
     """
     Find and load the model for the given symbol and features.
-    Example: find_model('BTC', ['Close', 'ROC', 'Moving Average'])
+    Example: find_model('BTC', ['Close', 'ROC', 'MA'])
     """
     method_classes = {
         "LSTM": LSTMModel,
@@ -38,8 +38,13 @@ def find_model(symbol, features):
     print(f"No model found for symbol {symbol} with features {features}")
     return None
 
-# Khởi tạo model là btcusdt lstm close roc
-model = None
+# Khởi tạo model khi start server, thay giá trị muốn load khởi tạo vào
+model_name = "lstm"
+model_features = []
+model_symbol = ""
+# load
+model = None # dùng hàm find_model để load
+
 
 @app.route('/change-model', methods=['POST'])
 def change_model():
