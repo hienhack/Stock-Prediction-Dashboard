@@ -6,6 +6,10 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+import numpy as np
+
+
 
 yf.pdr_override()
 
@@ -57,14 +61,22 @@ def plot_prediction(df, model, features):
 
     for index, col in enumerate(plot_data.columns):
         valid[f'{col}_Prediction'] = prediction[-10:, index]
+
+        # Tính toán các độ đo
+        mae = mean_absolute_error(valid[col], valid[f'{col}_Prediction'])
+        mse = mean_squared_error(valid[col], valid[f'{col}_Prediction'])
+        rmse = np.sqrt(mse)
+
         plt.figure(figsize=(16, 6))
-        plt.title(col)
+        plt.title(f"{col} - MAE: {mae:.4f}, MSE: {mse:.4f}, RMSE: {rmse:.4f}")
         plt.xlabel('Date', fontsize=18)
         plt.ylabel('Price USD ($)', fontsize=18)
         plt.plot(train[col])
         plt.plot(valid[[col, f'{col}_Prediction']])
         plt.legend(['Train', 'Valid', 'Prediction'], loc='lower right')
         plt.show()
+
+        print(f"{col} - MAE: {mae:.4f}, MSE: {mse:.4f}, RMSE: {rmse:.4f}")
 
 def visualize_model(stock, model_class, features):
     df = prepare_data()
@@ -100,10 +112,10 @@ def main():
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, LSTMModel, stock, features)
+        train_and_save_model(df, RNNModel, stock, features)
         # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
-    # stock = 'BTCUSDT'
-    # visualize_model(stock,RNNModel , ['Close', 'ROC'])
-    main()
+    stock = 'BTCUSDT'
+    visualize_model(stock,RNNModel ,  ['Close', 'ROC'])
+    # main()
