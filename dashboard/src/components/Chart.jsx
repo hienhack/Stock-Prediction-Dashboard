@@ -1,12 +1,13 @@
-import axios from "axios";
 import { createChart, ColorType } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
 import usePrediction from "../hooks/usePrediction";
-import useActualData from "../hooks/useAuctalData";
+// import useActualData from "../hooks/useAuctalData";
 
 function Chart({ showPred, symbol, model }) {
   const containerRef = useRef();
-  const [data, newCandle] = useActualData(symbol);
+  // const [data, newCandle] = useActualData(symbol);
+  const [data, setData] = useState([]);
+  const [newCandle, setNewCandle] = useState(null);
   const [historyPred, newPred] = usePrediction(model);
   const [actualSeries, setActualSeries] = useState(null);
   const [predSeries, setPredSeries] = useState(null);

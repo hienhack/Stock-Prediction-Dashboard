@@ -31,7 +31,7 @@ function App() {
                 suffixIcon={<HiOutlineChevronDown />}
                 mode="multiple"
                 placeholder="Select features"
-                defaultValue={features}
+                value={features}
                 options={FEATURE_OPTIONS}
                 onChange={(e) => setFeatures(e)}
               />
@@ -44,7 +44,7 @@ function App() {
                 labelInValue
                 className="w-[100px]"
                 suffixIcon={<HiOutlineChevronDown />}
-                defaultValue={method}
+                value={method}
                 options={METHOD_OPTIONS}
                 onChange={(e) => setMethod(e.value)}
               />

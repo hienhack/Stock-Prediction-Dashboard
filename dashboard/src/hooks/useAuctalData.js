@@ -7,6 +7,7 @@ function useActualData(symbol) {
     const [data, setData] = useState([]);
 
     useEffect(() => {
+        if (!symbol) return;
         // fetch historical data
         axios
             .get(

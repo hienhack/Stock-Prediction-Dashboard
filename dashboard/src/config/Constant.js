@@ -16,7 +16,7 @@ export const SYMBOL_OPTIONS = [
 export const METHOD_OPTIONS = [
     {
         label: "XBOOST",
-        value: "XBOOST",
+        value: "XGBoost",
     },
     {
         label: "RNN",
@@ -43,6 +43,6 @@ export const FEATURE_OPTIONS = [
     },
     {
         label: "Moving Average",
-        value: "MA",
+        value: "Moving Average",
     },
 ];
