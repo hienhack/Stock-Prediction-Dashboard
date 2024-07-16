@@ -99,10 +99,10 @@ def main():
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, RNNModel, stock, features)
-        # train_and_save_model(df, LSTMModel, stock, features)
+        # train_and_save_model(df, RNNModel, stock, features)
+        train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
-    # stock = 'BTCUSDT'
-    # visualize_model(stock,RNNModel , ['Close', 'ROC'])
-    main()
+    stock = 'BTCUSDT'
+    visualize_model(stock,LSTMModel , ['Close', 'ROC', 'RSI', 'Moving Average'])
+    # main()
