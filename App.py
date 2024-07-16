@@ -1,21 +1,19 @@
 from model.LSTMModel import LSTMModel
 from model.RNNModel import RNNModel
-from model.XgboostModel import XGBoostModel
 import yfinance as yf
-from pandas_datareader import data as pdr
-import pandas as pd
-yf.pdr_override()
-
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
+from datetime import datetime
+
+yf.pdr_override()
+
 sns.set_style('whitegrid')
 plt.style.use("fivethirtyeight")
 
-from datetime import datetime
-
 def load_data():
-    df = pd.read_csv('data/BTC-USD.csv')
+    # Tải dữ liệu với khoảng thời gian 5 phút trong 1 tháng gần nhất
+    df = yf.download(tickers='BTC-USD', period='1mo', interval='5m')
     return df
 
 def addROC(df):
@@ -36,6 +34,8 @@ def addMovingAverage(df):
 
 def prepare_data():
     df = load_data()
+    if df.empty:
+        raise ValueError("No data found. Please check the period and interval values.")
     df = addROC(df)
     df = addRSI(df)
     df = addMovingAverage(df)
@@ -73,10 +73,13 @@ def visualize_model(stock, model_class, features):
     model.load(model_path)
     plot_prediction(df, model, features)
 
-
 def main():
     df = prepare_data()
-    stock = 'BTC'
+    stock = 'BTCUSDT'
+
+    # Sử dụng 3000 cột dữ liệu gần nhất để huấn luyện
+    if len(df) > 3000:
+        df = df[-3000:]
 
     feature_sets = [
         ['Close'],
@@ -96,9 +99,10 @@ def main():
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, XGBoostModel, stock, features)
-        # train_and_save_model(df, RNNModel, stock, features)
+        train_and_save_model(df, RNNModel, stock, features)
         # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
+    # stock = 'BTCUSDT'
+    # visualize_model(stock,RNNModel , ['Close', 'ROC'])
     main()
