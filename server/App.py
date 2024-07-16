@@ -9,6 +9,8 @@ from model.XgboostModel import XGBoostModel
 import os
 import requests
 from datahelper import prepare_data
+from itertools import permutations
+
 
 
 app = Flask(__name__)
@@ -24,20 +26,24 @@ def find_model(symbol, method, features):
         "XGBoost": XGBoostModel
     }
 
-    model_name = f"{symbol}-{method}_{'_'.join(features)}"
-    model_path = os.path.join("./trained", model_name)
-    print('Find model ------------------')
-    print(model_path)
-    if os.path.exists(model_path):
-        print(f"Found model: {model_path}")
-        model_class = method_classes.get(method)
-        model = model_class(symbol)
-        try:
-            model.load(model_path)
-            return model
-        except Exception as e:
-            print(f"Failed to load model {model_name}: {e}")
-            return None
+    model_class = method_classes.get(method)
+    if not model_class:
+        print(f"No method class found for method: {method}")
+        return None
+
+    for perm in permutations(features):
+        model_name = f"{symbol}-{method}_{'_'.join(perm)}"
+        model_path = os.path.join("../trained", model_name)
+        print('Trying model path:', model_path)
+        if os.path.exists(model_path):
+            print(f"Found model: {model_path}")
+            model = model_class(symbol)
+            try:
+                model.load(model_path)
+                return model
+            except Exception as e:
+                print(f"Failed to load model {model_name}: {e}")
+                return None
 
     print(f"No model found for symbol {symbol} with features {features}")
     return None
