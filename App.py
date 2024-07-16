@@ -100,7 +100,7 @@ def main():
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, XGBoostModel, stock, features)
+        train_and_save_model(df, LSTMModel, stock, features)
         # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':

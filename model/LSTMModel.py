@@ -5,17 +5,23 @@ from tensorflow.keras.layers import Dense, LSTM, Dropout
 import joblib
 import numpy as np
 from datetime import datetime
+import os
 
 class LSTMModel(ModelBase):
     def __init__(self, stockName):
         super().__init__()
         self.T = 60
-        self.name = "LSTM_" + stockName + "_" + str(datetime.now().date());
+        self.stockName = stockName
+        self.method = "LSTM"
+        self.name = None
         self.x_scaler = None
         self.y_scaler = None
     
     def train(self, data, features):
         self.features = features
+
+        self.name = f"{self.stockName}-{self.method}_{'_'.join(features)}"
+
         # data includes the following columns: Open, High, Low, Close, Adj Close, Volume respectively according to the order
         
         # Keep only the features that we want to use
@@ -44,24 +50,20 @@ class LSTMModel(ModelBase):
         self.model.fit(x_train, y_train, epochs=10, batch_size=32)
     
     def load(self, path):
-        # Load the model
-        self.model = load_model(path + "/model.h5")
-        # Load the scaler
-        self.x_scaler = joblib.load(path + "/x_scaler.save")
-        self.y_scaler = joblib.load(path + "/y_scaler.save")
-        # Load the features
-        with open(path + "/features.txt", "r") as f:
+        self.model = load_model(os.path.join(path, "model.h5"))
+        self.x_scaler = joblib.load(os.path.join(path, "x_scaler.save"))
+        self.y_scaler = joblib.load(os.path.join(path, "y_scaler.save"))
+        with open(os.path.join(path, "features.txt"), "r") as f:
             self.features = f.read().split(",")
         print("Model and scaler loaded from", path)
     
-    def save(self, path):
-        # Save the model
-        self.model.save(path + "/model.h5")
-        # Save the scaler
-        joblib.dump(self.x_scaler, path + "/x_scaler.save")
-        joblib.dump(self.y_scaler, path + "/y_scaler.save")
-        # Save the features
-        with open(path + "/features.txt", "w") as f:
+    def save(self, base_path):
+        path = os.path.join(base_path, self.name)
+        os.makedirs(path, exist_ok=True)
+        self.model.save(os.path.join(path, "model.h5"))
+        joblib.dump(self.x_scaler, os.path.join(path, "x_scaler.save"))
+        joblib.dump(self.y_scaler, os.path.join(path, "y_scaler.save"))
+        with open(os.path.join(path, "features.txt"), "w") as f:
             f.write(",".join(self.features))
         print(f"Model and scaler saved to {path}")
 
