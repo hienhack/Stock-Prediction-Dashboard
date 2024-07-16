@@ -45,6 +45,21 @@ def find_model(symbol, features):
     print(f"No model found for symbol {symbol} with features {features}")
     return None
 
+def fetch_binance_data(symbol="BTCUSDT", interval="5m", limit=200):
+    url = f"https://api.binance.us/api/v3/klines"
+    params = {
+        "symbol": symbol,
+        "interval": interval,
+        "limit": limit
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to fetch data: {response.status_code}")
+        return None
+    
+
 @app.route('/change-model', methods=['POST'])
 def change_model():
     global model_name, model_symbol, model_features, model
@@ -67,21 +82,7 @@ def get_current_model():
         "features": model_features
     })
 
-@app.route('/prediction')
-def fetch_binance_data(symbol="BTCUSDT", interval="5m", limit=200):
-    url = f"https://api.binance.us/api/v3/klines"
-    params = {
-        "symbol": symbol,
-        "interval": interval,
-        "limit": limit
-    }
-    response = requests.get(url, params=params)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        print(f"Failed to fetch data: {response.status_code}")
-        return None
-    
+@app.route('/prediction')   
 def get_prediction():
     global model, model_symbol
 
@@ -97,13 +98,14 @@ def get_prediction():
 
     if model:
         # Ensure column names match the expected names used in the model prediction
-        df.rename(columns={'c': 'Close'}, inplace=True)
-        df.rename(columns={'t': 'Date'}, inplace=True)
+        df.rename(columns={'t': 'Datetime'}, inplace=True)
         df.rename(columns={'o': 'Open'}, inplace=True)
         df.rename(columns={'h': 'High'}, inplace=True)
         df.rename(columns={'l': 'Low'}, inplace=True)
+        df.rename(columns={'c': 'Close'}, inplace=True)
+        
             
-        predictions = model.predict(df[['Date','Open','Close','High', 'Low']])
+        predictions = model.predict(df[['Datetime','Open','High','Low', 'Close']])
         return predictions
     else:
         return jsonify({"status": "error", "message": "No model loaded"}), 400
