@@ -1,7 +1,12 @@
 import pandas as pd
 
 def addROC(df: pd.DataFrame) -> pd.DataFrame:
-    df['ROC'] = ((df['Close'] - df['Close'].shift(12)) / (df['Close'].shift(12))) * 100
+    # Ensure 'Close' column is numeric
+    df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
+    
+    # Calculate the Rate of Change (ROC)
+    df['ROC'] = ((df['Close'] - df['Close'].shift(12)) / df['Close'].shift(12)) * 100
+    
     return df
 
 def addRSI(df):

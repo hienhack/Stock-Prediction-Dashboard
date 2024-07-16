@@ -25,8 +25,9 @@ def find_model(symbol, method, features):
     }
 
     model_name = f"{symbol}-{method}_{'_'.join(features)}"
-    model_path = os.path.join("../trained", model_name)
+    model_path = os.path.join("./trained", model_name)
     print('Find model ------------------')
+    print(model_path)
     if os.path.exists(model_path):
         print(f"Found model: {model_path}")
         model_class = method_classes.get(method)
