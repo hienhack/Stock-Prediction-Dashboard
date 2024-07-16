@@ -15,8 +15,8 @@ app = Flask(__name__)
 app.secret_key = "secret_key"
 
 model_name = "lstm"
-model_features = []
-model_symbol = ""
+model_features = ['Close', 'ROC']
+model_symbol = "BTCUSDT"
 model = None
 
 def find_model(symbol, features):
@@ -95,7 +95,6 @@ def get_prediction():
     df = pd.DataFrame(data, columns=['t', 'o', 'h', 'l', 'c', 'v', 'T', 'q', 'n', 'V', 'Q', 'B'])
     df = df[['t', 'o', 'h', 'l', 'c']]
     df['t'] = pd.to_datetime(df['t'], unit='ms')
-
     if model:
         # Ensure column names match the expected names used in the model prediction
         df.rename(columns={'t': 'Datetime'}, inplace=True)
@@ -104,9 +103,13 @@ def get_prediction():
         df.rename(columns={'l': 'Low'}, inplace=True)
         df.rename(columns={'c': 'Close'}, inplace=True)
         
-            
-        predictions = model.predict(df[['Datetime','Open','High','Low', 'Close']])
-        return predictions
+         # Perform prediction
+        predictions = model.predict(df)
+        print(predictions)
+        # Convert predictions to a list for JSON response
+        predictions_list = predictions.tolist()
+        
+        return jsonify({"status": "success", "predictions": predictions_list})
     else:
         return jsonify({"status": "error", "message": "No model loaded"}), 400
 

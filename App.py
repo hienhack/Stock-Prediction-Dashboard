@@ -1,5 +1,6 @@
 from model.LSTMModel import LSTMModel
 from model.RNNModel import RNNModel
+from model.XgboostModel import XGBoostModel
 import yfinance as yf
 import os
 import matplotlib.pyplot as plt
@@ -99,7 +100,7 @@ def main():
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, RNNModel, stock, features)
+        train_and_save_model(df, XGBoostModel, stock, features)
         # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
