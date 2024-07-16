@@ -4,11 +4,12 @@ from flask_socketio import SocketIO, join_room, leave_room
 import socket
 
 import pandas as pd
-from AppSocket import subscribe, unsubscribe
 from model.LSTMModel import LSTMModel
 from model.RNNModel import RNNModel
 from model.XgboostModel import XGBoostModel
 import os
+import requests
+import datetime
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
@@ -67,33 +68,43 @@ def get_current_model():
     })
 
 @app.route('/prediction')
+def fetch_binance_data(symbol="BTCUSDT", interval="5m", limit=200):
+    url = f"https://api.binance.us/api/v3/klines"
+    params = {
+        "symbol": symbol,
+        "interval": interval,
+        "limit": limit
+    }
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Failed to fetch data: {response.status_code}")
+        return None
+    
 def get_prediction():
     global model, model_symbol
 
-    end = int(request.args.get('end'))
-    limit = int(request.args.get('limit'))
+    # Fetch data from Binance
+    data = fetch_binance_data(symbol=model_symbol)
+    if data is None:
+        return jsonify({"status": "error", "message": "Failed to fetch Binance data"}), 500
 
-    # Read historical data from CSV
-    try:
-        df = pd.read_csv(f'{model_symbol}.csv')
-    except FileNotFoundError:
-        return jsonify({"status": "error", "message": f"No data found for {model_symbol}"}), 404
+    # Convert data to DataFrame
+    df = pd.DataFrame(data, columns=['t', 'o', 'h', 'l', 'c', 'v', 'T', 'q', 'n', 'V', 'Q', 'B'])
+    df = df[['t', 'o', 'h', 'l', 'c']]
+    df['t'] = pd.to_datetime(df['t'], unit='ms')
 
-    # Assuming YourModelClass has a predict method
     if model:
-        try:
-            # Prepare data for prediction
-            data_to_predict = df.iloc[-limit:]  # Get the last 'limit' rows
-            predictions = model.predict(data_to_predict)
-
-            # Format predictions as required ([[t, o, h, l, c], [t, o, h, l, c], ...])
-            prediction_list = []
-            for prediction in predictions:
-                prediction_list.append([prediction['t'], prediction['o'], prediction['h'], prediction['l'], prediction['c']])
-
-            return jsonify(prediction_list)
-        except Exception as e:
-            return jsonify({"status": "error", "message": str(e)}), 500
+        # Ensure column names match the expected names used in the model prediction
+        df.rename(columns={'c': 'Close'}, inplace=True)
+        df.rename(columns={'t': 'Date'}, inplace=True)
+        df.rename(columns={'o': 'Open'}, inplace=True)
+        df.rename(columns={'h': 'High'}, inplace=True)
+        df.rename(columns={'l': 'Low'}, inplace=True)
+            
+        predictions = model.predict(df[['Date','Open','Close','High', 'Low']])
+        return predictions
     else:
         return jsonify({"status": "error", "message": "No model loaded"}), 400
 
