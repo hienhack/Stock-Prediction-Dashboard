@@ -4,7 +4,7 @@ import { IoCaretDown } from "react-icons/io5";
 import clsx from "clsx";
 import { useState } from "react";
 
-function SelectSymbol({ symbol, setSymbol }) {
+function SelectSymbol({ symbol, onChange }) {
   const [changingSymbol, setChangingSymbol] = useState(false);
 
   return (
@@ -13,7 +13,7 @@ function SelectSymbol({ symbol, setSymbol }) {
         menu={{
           items: SYMBOL_OPTIONS,
           selectable: true,
-          onClick: (e) => setSymbol(e.key),
+          onClick: (e) => onChange(e.key),
         }}
         trigger={["click"]}
       >

@@ -2,40 +2,31 @@ import { useEffect, useRef, useState } from "react";
 import { api } from '../api';
 
 function useSelectModel() {
-    const [method, setMethod] = useState(null);
-    const [features, setFeatures] = useState([]);
-    const [symbol, setSymbol] = useState(null);
     const [model, setModel] = useState(null);
+    const [changing, setChanging] = useState(false);
 
     useEffect(() => {
         api.get("/current-model").then((res) => {
-            setMethod(res.data.model);
-            setFeatures(res.data.features);
-            setSymbol(res.data.symbol);
             setModel(res.data);
         }).catch((err) => {
             console.log(err);
         });
     }, []);
 
-    useEffect(() => {
-        if (!method || features.length === 0 || !symbol) return;
-
-        api.post("/change-model", { model: method, features, symbol })
+    const changeModel = (model) => {
+        setModel(model);
+        api.post("/change-model", { model: model.method, features: model.features, symbol: model.symbol })
             .then((res) => {
                 setModel(res.data);
             })
             .catch((err) => {
                 console.log(err);
-            });
+            }).finally(() => {
+                setChanging(false);
+            })
+    }
 
-        const newModel = { method, features, symbol };
-
-        setModel(newModel);
-
-    }, [method, symbol, features]);
-
-    return { method, setMethod, setFeatures, features, symbol, setSymbol, model };
+    return { model, changeModel, changing };
 }
 
 export default useSelectModel;

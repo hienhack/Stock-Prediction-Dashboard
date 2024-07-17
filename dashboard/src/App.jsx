@@ -6,22 +6,29 @@ import { FEATURE_OPTIONS, METHOD_OPTIONS } from "./config/Constant";
 import useSelectModel from "./hooks/useSelectModel";
 import SelectSymbol from "./components/SelectSymbol";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
+import clsx from "clsx";
 
 function App() {
   const [showPrediction, setShowPrediction] = useState(true);
-  const { method, setMethod, setFeatures, features, symbol, setSymbol, model } =
-    useSelectModel();
-
-  useEffect(() => {
-    console.log("Model have changed: ", model?.symbol);
-  }, [model]);
+  const { model, setModel, changing } = useSelectModel();
 
   return (
     <div className="min-h-screen bg-slate-50 py-5">
       <div className="w-4/5 max-w-screen-2xl mx-auto">
-        <SelectSymbol symbol={symbol} setSymbol={setSymbol} />
+        <SelectSymbol
+          symbol={model?.symbol}
+          onChange={(symbol) => setModel({ ...model, symbol: symbol })}
+        />
         <div className="mt-2.5 flex items-end justify-end">
           <div className="flex items-end space-x-4">
+            <h6
+              className={clsx(
+                "italic text-slate-900 opacity-25 mr-3",
+                !changing && "invisible"
+              )}
+            >
+              Changing model...
+            </h6>
             <div>
               <h6 className="text-slate-600 font-medium text-sm mb-1">
                 Features
@@ -31,9 +38,15 @@ function App() {
                 suffixIcon={<HiOutlineChevronDown />}
                 mode="multiple"
                 placeholder="Select features"
-                value={features}
+                value={model?.features || []}
                 options={FEATURE_OPTIONS}
-                onChange={(e) => setFeatures(e)}
+                onChange={(e) => {
+                  if (e.length == 0) {
+                    alert("Please select at least one feature");
+                    return;
+                  }
+                  setModel({ ...model, features: e });
+                }}
               />
             </div>
             <div>
@@ -44,9 +57,9 @@ function App() {
                 labelInValue
                 className="w-[100px]"
                 suffixIcon={<HiOutlineChevronDown />}
-                value={method}
+                value={model?.method}
                 options={METHOD_OPTIONS}
-                onChange={(e) => setMethod(e.value)}
+                onChange={(e) => setModel({ ...model, method: e.value })}
               />
             </div>
             <Tooltip
@@ -66,7 +79,7 @@ function App() {
           </div>
         </div>
         <div className="mt-10">
-          <Chart showPred={showPrediction} model={model} symbol={symbol} />
+          <Chart showPred={showPrediction} model={model} />
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ws, subscribe, unsubscribe } from '../Socket';
 import axios from 'axios';
 
@@ -16,7 +16,7 @@ function useActualData(symbol) {
             .then((res) => {
                 const fetchedData = res.data.map((tf) => {
                     const [time, open, high, low, close] = tf.map((e) => Number(e));
-                    return { time: time / 1000, open, high, low, close };
+                    return { time: time / 1000 + 25200, open, high, low, close };
                 });
                 setData(fetchedData);
             })
@@ -29,11 +29,9 @@ function useActualData(symbol) {
 
         const evnetHandler = (event) => {
             const message = JSON.parse(event.data);
-            console.log("message: ", message);
             if (message.k) {
                 const { t, o, h, l, c, s } = message.k;
-                console.log(s);
-                setNewCandle({ time: t / 1000, open: Number(o), high: Number(h), low: Number(l), close: Number(c) });
+                setNewCandle({ time: t / 1000 + 25500, open: Number(o), high: Number(h), low: Number(l), close: Number(c) });
             }
         }
 

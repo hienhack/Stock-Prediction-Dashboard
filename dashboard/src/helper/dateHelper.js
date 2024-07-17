@@ -13,9 +13,17 @@ export default (timestamp) => {
     return `${month} ${day} ${year} ${hours}:${minutes}`;
 }
 
-export const getDistance = (lastTime) => {
+export const getTimeDiff = () => {
     const now = new Date();
-    const nextMin = Math.floor(now.getMinutes() / 5 + 1) * 5;
-    const nextTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), nextMin, 20, 0);
-    return nextTime.getTime() - lastTime;
+    const lastMin = Math.floor(now.getMinutes() / 5) * 5;
+    console.log(lastMin);
+    const lastTime = new Date();
+    lastTime.setMinutes(lastMin, 0, 0);
+    console.log(lastTime);
+    if (now.getTime() - lastTime.getTime() < 10000) {
+        return 10000 - now.getTime() + lastTime.getTime();
+    }
+
+    lastTime.setMinutes(lastMin + 5, 10);
+    return lastTime.getTime() - now.getTime();
 }

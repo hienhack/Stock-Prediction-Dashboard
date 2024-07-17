@@ -1,13 +1,13 @@
 import { createChart, ColorType } from "lightweight-charts";
 import { useEffect, useRef, useState } from "react";
 import usePrediction from "../hooks/usePrediction";
-// import useActualData from "../hooks/useAuctalData";
+import useActualData from "../hooks/useAuctalData";
 
-function Chart({ showPred, symbol, model }) {
+function Chart({ showPred, model }) {
   const containerRef = useRef();
-  // const [data, newCandle] = useActualData(symbol);
-  const [data, setData] = useState([]);
-  const [newCandle, setNewCandle] = useState(null);
+  const [data, newCandle] = useActualData(model?.symbol);
+  // const [data, setData] = useState([]);
+  // const [newCandle, setNewCandle] = useState(null);
   const [historyPred, newPred] = usePrediction(model);
   const [actualSeries, setActualSeries] = useState(null);
   const [predSeries, setPredSeries] = useState(null);
@@ -22,6 +22,9 @@ function Chart({ showPred, symbol, model }) {
       },
       width: containerRef.current.clientWidth,
       height: containerRef.current.clientHeight,
+      timeScale: {
+        timeVisible: true,
+      },
     });
     chart.timeScale().fitContent();
     chart.timeScale().scrollToPosition(5);
