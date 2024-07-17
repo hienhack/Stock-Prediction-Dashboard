@@ -78,7 +78,7 @@ def change_model():
     
     model = find_model(model_symbol, model_name, model_features)
     if model:
-        return jsonify({"status": "success"}), 200
+        return jsonify({"method": model_name, "symbol": model_symbol, "features": model_features}), 200
     else:
         return jsonify({"status": "error", "message": "Model not found"}), 400
 
