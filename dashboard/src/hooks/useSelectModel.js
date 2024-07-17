@@ -15,7 +15,7 @@ function useSelectModel() {
 
     const changeModel = (model) => {
         setModel(model);
-        api.post("/change-model", { model: model.method, features: model.features, symbol: model.symbol })
+        api.post("/change-model", model)
             .then((res) => {
                 setModel(res.data);
             })

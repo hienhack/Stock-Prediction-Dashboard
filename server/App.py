@@ -72,7 +72,7 @@ print("Find model ....")
 def change_model():
     global model_name, model_symbol, model_features, model
     data = request.json
-    model_name = data.get('model')
+    model_name = data.get('method')
     model_symbol = data.get('symbol')
     model_features = data.get('features')
     
@@ -85,7 +85,7 @@ def change_model():
 @app.route('/current-model')
 def get_current_model():
     return jsonify({
-        "model": model_name,
+        "method": model_name,
         "symbol": model_symbol,
         "features": model_features
     })

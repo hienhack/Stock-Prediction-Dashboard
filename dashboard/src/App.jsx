@@ -10,14 +10,14 @@ import clsx from "clsx";
 
 function App() {
   const [showPrediction, setShowPrediction] = useState(true);
-  const { model, setModel, changing } = useSelectModel();
+  const { model, changeModel, changing } = useSelectModel();
 
   return (
     <div className="min-h-screen bg-slate-50 py-5">
       <div className="w-4/5 max-w-screen-2xl mx-auto">
         <SelectSymbol
           symbol={model?.symbol}
-          onChange={(symbol) => setModel({ ...model, symbol: symbol })}
+          onChange={(symbol) => changeModel({ ...model, symbol: symbol })}
         />
         <div className="mt-2.5 flex items-end justify-end">
           <div className="flex items-end space-x-4">
@@ -45,7 +45,7 @@ function App() {
                     alert("Please select at least one feature");
                     return;
                   }
-                  setModel({ ...model, features: e });
+                  changeModel({ ...model, features: e });
                 }}
               />
             </div>
@@ -59,7 +59,7 @@ function App() {
                 suffixIcon={<HiOutlineChevronDown />}
                 value={model?.method}
                 options={METHOD_OPTIONS}
-                onChange={(e) => setModel({ ...model, method: e.value })}
+                onChange={(e) => changeModel({ ...model, method: e.value })}
               />
             </div>
             <Tooltip
