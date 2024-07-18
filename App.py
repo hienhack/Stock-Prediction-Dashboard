@@ -34,7 +34,7 @@ def addRSI(df):
     return df
 
 def addMovingAverage(df):
-    df['Moving Average'] = df['Close'].rolling(window=14).mean()
+    df['Moving Average'] = df['Close'].rolling(window=60).mean()
     return df
 
 def prepare_data():
@@ -88,34 +88,35 @@ def visualize_model(stock, model_class, features):
 
 def main():
     df = prepare_data()
-    stock = 'BTCUSDT'
 
-    # Sử dụng 3000 cột dữ liệu gần nhất để huấn luyện
+    # # Sử dụng 3000 cột dữ liệu gần nhất để huấn luyện
     if len(df) > 3000:
         df = df[-3000:]
 
     feature_sets = [
-        ['Close'],
-        ['ROC'],
-        ['RSI'],
-        ['Moving Average'],
-        ['Close', 'ROC'],
-        ['Close', 'RSI'],
-        ['Close', 'Moving Average'],
-        ['ROC', 'RSI'],
-        ['ROC', 'Moving Average'],
-        ['RSI', 'Moving Average'],
-        ['Close', 'ROC', 'RSI'],
-        ['Close', 'ROC', 'Moving Average'],
-        ['ROC', 'RSI', 'Moving Average'],
-        ['Close', 'ROC', 'RSI', 'Moving Average']
+        # ['Close'],
+        # ['ROC'],
+        # ['RSI'],
+        # ['Moving Average'],
+        # ['Close', 'ROC'],
+        # ['Close', 'RSI'],
+        # ['Close', 'Moving Average'],
+        # ['ROC', 'RSI'],
+        # ['ROC', 'Moving Average'],
+        # ['RSI', 'Moving Average'],
+        # ['Close', 'ROC', 'RSI'],
+        # ['Close', 'ROC', 'Moving Average'],
+        ['Close', 'RSI', 'Moving Average'],
+        # ['ROC', 'RSI', 'Moving Average'],
+        # ['Close', 'ROC', 'RSI', 'Moving Average']
     ]
 
     for features in feature_sets:
-        train_and_save_model(df, RNNModel, stock, features)
-        # train_and_save_model(df, LSTMModel, stock, features)
+        # train_and_save_model(df, RNNModel, stock, features)
+        train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
     stock = 'BTCUSDT'
-    visualize_model(stock,RNNModel ,  ['Close', 'ROC'])
+    main()
+    # visualize_model(stock,RNNModel ,  ['Close', 'ROC'])
     # main()
