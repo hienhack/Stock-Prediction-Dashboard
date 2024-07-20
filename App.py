@@ -1,5 +1,6 @@
 from model.RNNModel import RNNModel
 from model.LSTMModel import LSTMModel
+from model.XgboostModel import XGBoostModel
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -133,7 +134,7 @@ def visualize_model(symbol, stock, model_class, features):
     plot_prediction(df, model, features)
 
 def main():
-    symbols = ["ADAUSDT", "ETHUSDT"]
+    symbols = ["BTCUSDT", "ADAUSDT", "ETHUSDT"]
     for symbol in symbols:
         df = prepare_data_from_binance(symbol)
         stock = symbol
@@ -160,11 +161,12 @@ def main():
         ]
 
         for features in feature_sets:
-            train_and_save_model(df, LSTMModel , stock, features)
-            # train_and_save_model(df, LSTMModel, stock, features)
+            train_and_save_model(df, XGBoostModel , stock, features)
+            train_and_save_model(df, LSTMModel, stock, features)
+            train_and_save_model(df, RNNModel, stock, features)
 
 if __name__ == '__main__':
-    symbols = ["BTCUSDT", "ADAUSDT", "ETHUSDT"]
+    # symbols = ["BTCUSDT", "ADAUSDT", "ETHUSDT"]
     # for symbol in symbols:
     #     visualize_model(symbol, symbol, RNNModel, ['Close', 'ROC', 'RSI', 'Moving Average'])
     main()
