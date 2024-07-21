@@ -9,8 +9,8 @@
 # Link video demo
     https://youtu.be/99r5maPIm3Y
 
-# Get trained model
-    Run App.py in root repository
+# Train model
+    python App.py
 
 # Run server
     cd server
