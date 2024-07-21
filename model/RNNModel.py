@@ -1,7 +1,8 @@
 from .ModelBase import ModelBase
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential, load_model
 from tensorflow.keras.layers import Dense, SimpleRNN, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
 import joblib
 import os
 import numpy as np
@@ -21,8 +22,8 @@ class RNNModel(ModelBase):
         self.name = f"{self.stockName}-{self.method}_{'_'.join(features)}"
         dataset = data[features].values 
 
-        self.x_scaler = StandardScaler()
-        self.y_scaler = StandardScaler()
+        self.x_scaler = MinMaxScaler()
+        self.y_scaler = MinMaxScaler()
 
         x_scaled_data = self.x_scaler.fit_transform(dataset)
         y_scaled_data = self.y_scaler.fit_transform(data[['Open', 'High', 'Low', 'Close']].values)
@@ -37,7 +38,8 @@ class RNNModel(ModelBase):
         x_train, y_train = np.array(x_train), np.array(y_train)
         
         self.model = self.__create_model(x_train.shape[1:])
-        self.model.fit(x_train, y_train, epochs=20, batch_size=32)  # Số epochs và batch size như trong ví dụ
+        early_stopping = EarlyStopping(monitor='val_loss', patience=10, restore_best_weights=True)
+        self.model.fit(x_train, y_train, epochs=100, batch_size=32, validation_split=0.2, callbacks=[early_stopping])
 
     def load(self, path):
         self.model = load_model(os.path.join(path, "model.h5"))
@@ -73,6 +75,7 @@ class RNNModel(ModelBase):
         model = Sequential()
         model.add(SimpleRNN(100, return_sequences=True, input_shape=input_shape))
         model.add(SimpleRNN(100, return_sequences=False))
+        model.add(Dropout(0.2))
         model.add(Dense(50))
         model.add(Dense(4))
 

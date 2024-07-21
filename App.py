@@ -134,37 +134,35 @@ def visualize_model(symbol, stock, model_class, features):
     plot_prediction(df, model, features)
 
 def main():
-    symbols = ["BTCUSDT", "ADAUSDT", "ETHUSDT"]
+    symbols = ["ADAUSDT", "ETHUSDT"]
     for symbol in symbols:
         df = prepare_data_from_binance(symbol)
         stock = symbol
 
-    # # Sử dụng 3000 cột dữ liệu gần nhất để huấn luyện
-    if len(df) > 3000:
-        df = df[-3000:]
+        # Sử dụng 3000 cột dữ liệu gần nhất để huấn luyện
+        if len(df) > 6000:
+            df = df[-6000:]
 
         feature_sets = [
-            # ['Close'],
-            # ['ROC'],
-            # ['RSI'],
-            # ['Moving Average'],
-            # ['Close', 'ROC'],
-            # ['Close', 'RSI'],
-            # ['Close', 'Moving Average'],
-            # ['ROC', 'RSI'],
-            # ['ROC', 'Moving Average'],
-            # ['RSI', 'Moving Average'],
-            # ['Close', 'ROC', 'RSI'],
-            # ['Close', 'ROC', 'Moving Average'],
-            ['Close', 'RSI', 'Moving Average'],
-        # ['ROC', 'RSI', 'Moving Average'],
-            # ['Close', 'ROC', 'RSI', 'Moving Average']
+            ['Close'],
+            ['ROC'],
+            ['RSI'],
+            ['Moving Average'],
+            ['Close', 'ROC'],
+            ['Close', 'RSI'],
+            ['Close', 'Moving Average'],
+            ['ROC', 'RSI'],
+            ['ROC', 'Moving Average'],
+            ['RSI', 'Moving Average'],
+            ['Close', 'ROC', 'RSI'],
+            ['Close', 'ROC', 'Moving Average'],
+            ['ROC', 'RSI', 'Moving Average'],
+            ['Close', 'ROC', 'RSI', 'Moving Average']
         ]
 
         for features in feature_sets:
-            train_and_save_model(df, XGBoostModel , stock, features)
-            train_and_save_model(df, LSTMModel, stock, features)
-            train_and_save_model(df, RNNModel, stock, features)
+            train_and_save_model(df, RNNModel , stock, features)
+            # train_and_save_model(df, LSTMModel, stock, features)
 
 if __name__ == '__main__':
     # symbols = ["BTCUSDT", "ADAUSDT", "ETHUSDT"]
