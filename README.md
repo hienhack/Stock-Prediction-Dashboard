@@ -14,7 +14,7 @@
 
 # Run server
     cd server
-    run main.py
+    python main.py
 # Run client
     cd dashboard
     npm i
