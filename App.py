@@ -144,26 +144,27 @@ def main():
             df = df[-6000:]
 
         feature_sets = [
-            ['Close'],
-            ['ROC'],
-            ['RSI'],
-            ['Moving Average'],
-            ['Close', 'ROC'],
-            ['Close', 'RSI'],
-            ['Close', 'Moving Average'],
-            ['ROC', 'RSI'],
-            ['ROC', 'Moving Average'],
-            ['RSI', 'Moving Average'],
-            ['Close', 'ROC', 'RSI'],
-            ['Close', 'ROC', 'Moving Average'],
-            ['ROC', 'RSI', 'Moving Average'],
-            ['Close', 'ROC', 'RSI', 'Moving Average']
+            # ['Close'],
+            # ['ROC'],
+            # ['RSI'],
+            # ['Moving Average'],
+            # ['Close', 'ROC'],
+            # ['Close', 'RSI'],
+            # ['Close', 'Moving Average'],
+            # ['ROC', 'RSI'],
+            # ['ROC', 'Moving Average'],
+            # ['RSI', 'Moving Average'],
+            # ['Close', 'ROC', 'RSI'],
+            # ['Close', 'ROC', 'Moving Average'],
+            # ['ROC', 'RSI', 'Moving Average'],
+            # ['Close', 'ROC', 'RSI', 'Moving Average']
+            ['Close', 'RSI', 'Moving Average']
         ]
 
         for features in feature_sets:
             train_and_save_model(df, RNNModel , stock, features)
-            train_and_save_model(df, LSTMModel, stock, features)
-            train_and_save_model(df, XGBoostModel, stock, features)
+            # train_and_save_model(df, LSTMModel, stock, features)
+            # train_and_save_model(df, XGBoostModel, stock, features)
 
 if __name__ == '__main__':
     main()
